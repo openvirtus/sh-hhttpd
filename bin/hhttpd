@@ -30,6 +30,7 @@
 #h:    -s php        : Use PHP to service the directory.
 #h:    -s artisan    : Use artisan to serve Laravel website.
 #h:    -s mini_httpd : Use `mini_httpd` to serve site.
+#h:    -s busybox    : Use `busybox` to serve the site.
 #h:    -i composer   : Install composer, required to build PHP sites.
 #h:    -b            : Build (composer: composer.json).
 #h:
@@ -123,7 +124,27 @@ hhttpd_execute_mini_httpd() { # DIR
          -d "${directory}"                  \
          ${args}
 }
+hhttpd_execute_busybox() { # DIR
+    if ! which php-cgi >/dev/null 2>&1;then
+        echo "hhttpd: error: Please install 'php-cgi' before proceding." >&2
+        exit 1
+    fi
+    local directory="$1"
+    echo "
+    *.php:`which php-cgi`
+    I:index.php
+    " > /tmp/httpd.conf
+    echo "Remember to edit /etc/php.ini:"
+    echo 'cgi.force_redirect = 0'
+    echo 'cgi.redirect_status_env = "yes"'
 
+    vrun /bin/busybox httpd  \
+         -f                  \
+         -v                  \
+         -p "${HHTTPD_PORT}" \
+         -h "${directory}"   \
+         -c /tmp/httpd.conf
+}
 
 
 
