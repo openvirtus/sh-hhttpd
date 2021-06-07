@@ -1,5 +1,8 @@
 #!/bin/sh -e
 #L:
+#L:  This software is free to use and modify, but not free to maintain.
+#L:
+#l:  Donate bitcoin: 1C1ZzDje7vHhF23mxqfcACE8QD4nqxywiV
 #l:  Copyright (c) 2018 Openvirtus.com, http://openvirtus.com
 #L:
 #L:  Permission is hereby granted, free of charge, to any person obtaining
@@ -21,6 +24,8 @@
 #L:  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 #L:  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #L:
+#r: ## HHTTPD
+#r:
 #h: Usage: $0 [OPTIONS...] [-b] DIRECTORY [PORT]
 #h:
 #h: This script helps launching different HTTP servers. This is usefull to
@@ -39,7 +44,8 @@
 #h:
 #h: Examples:
 #h:
-#h:    > httpd -s mini_httpd -d harkadev.com -S . 441
+#h:    > httpd -s mini_httpd -d example.com -S . 441
+#r:
 hhttpd() {
     ## Parse command line arguments.
     local OPTIND optopt= ops= installs= i=
