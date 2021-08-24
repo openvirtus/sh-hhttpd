@@ -39,6 +39,7 @@
 #h:    -i composer   : Install composer, required to build PHP sites.
 #h:    -b            : Build (composer: composer.json).
 #h:
+#h:    -o OPTION=VAL :
 #h:    -d DOMAIN     : Domain to serve.
 #h:    -S            : Enable TLS/SSL.
 #h:
@@ -49,12 +50,13 @@
 hhttpd() {
     ## Parse command line arguments.
     local OPTIND optopt= ops= installs= i=
-    while getopts "vs:i:bd:S" optopt;do # OPTARG
+    while getopts "vs:i:bd:So:" optopt;do # OPTARG
         local ops="${ops}${optopt}"
         case $optopt in
             s)  HHTTPD_SELECT="${OPTARG}" ;;
             d)  HHTTPD_DOMAIN="${OPTARG}" ;;
             S)  HHTTPD_ENABLE_SSL=y       ;;
+            o)  local "${OPTARG}"         ;;
             i)  local installs="${installs} ${OPTARG}";;
             \?) return 1;;
         esac
@@ -85,6 +87,7 @@ hhttpd_show_variables() {
     printf '%-20s : %s\n' HHTTPD_PORT       "${HHTTPD_PORT}"
     printf '%-20s : %s\n' HHTTPD_DOMAIN     "${HHTTPD_DOMAIN}"
     printf '%-20s : %s\n' HHTTPD_ENABLE_SSL "${HHTTPD_ENABLE_SSL}"
+    printf '%-20s : %s\n' HHTTPD_HOST       "${HHTTPD_HOST}"
     printf '%-20s : %s\n' HSSL_ETCDIR       "${HSSL_ETCDIR}"
 }
 hhttpd_calc_variables() {
@@ -92,6 +95,7 @@ hhttpd_calc_variables() {
     HHTTPD_PORT="${HHTTPD_PORT:-8081}"
     HHTTPD_DOMAIN="${HHTTPD_DOMAIN:-`hostname`}"
     HHTTPD_ENABLE_SSL="${HHTTPD_ENABLE_SSL:-n}"
+    HHTTPD_HOST="${HHTTPD_HOST:-127.0.0.1}"
     HSSL_ETCDIR="${HSSL_ETCDIR:-/etc/ssl}"
 }
 ## -----------------------------------------------------------------------
@@ -123,7 +127,7 @@ hhttpd_execute_mini_httpd() { # DIR
     fi
     vrun /usr/sbin/mini_httpd               \
          -D `: Foreground`                  \
-         -h 127.0.0.1                       \
+         -h "${HHTTPD_HOST}"                \
          -p "${HHTTPD_PORT}"                \
          -c "**.cgi"                        \
          -u "${USER}" `: Default is nobody` \
